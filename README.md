@@ -6,11 +6,25 @@ Vault is a tool for securely accessing secrets. A secret is anything that you wa
 
 All documentation is available on the [Vault website](https://www.vaultproject.io).
 
-## Available environment
+## Installation
 
-- DEV - ```/v1/secret/dev/```
-- PROD - ```/v1/secret/prod/```
-- TEST - ```/v1/secret/test/```
+### Composer
+
+The preferred way to install this extension is through [Composer](http://getcomposer.org/).
+
+Either run
+
+```
+composer require dykyi-roman/vault-client "dev-master"
+```
+
+or add
+
+```
+"dykyi-roman/vault-client": "master"
+```
+
+to the require section of your ```composer.json```
 
 ## Usage
 
@@ -37,6 +51,11 @@ if ($client->init()){
     $client->delete('db');
 }
 ```
+## Available environment
+
+- DEV - ```/v1/secret/dev/```
+- PROD - ```/v1/secret/prod/```
+- TEST - ```/v1/secret/test/```
 
 ## Author
 [Dykyi Roman](https://www.linkedin.com/in/roman-dykyi-43428543/), e-mail: [mr.dukuy@gmail.com](mailto:mr.dukuy@gmail.com)
