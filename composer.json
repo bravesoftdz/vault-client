@@ -1,0 +1,17 @@
+{
+    "name": "Vault Client",
+    "license": "proprietary",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Dykyi\\": ["src/"]
+        }
+    },
+    "require": {
+        "psr/log": "^1.0",
+        "eloquent/enumeration": "^5.1",
+        "psr/http-message": "*",
+        "guzzlehttp/guzzle": "^6.3",
+        "vlucas/phpdotenv": "^2.4"
+    }
+}
