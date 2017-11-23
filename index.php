@@ -2,9 +2,19 @@
 
 require_once "vendor/autoload.php";
 
-$client = new \Dykyi\Client(new \GuzzleHttp\Client(), new \Dykyi\ResponseDataExtractor());
-//echo $client->init();
-//var_dump($client->read('foo')); die();
-//$client->write('test6',['test' => 2113]);
+use Dykyi\Client;
+use Dykyi\ResponseDataExtractor;
+use GuzzleHttp\Client as GuzzClient;
+
+$client = new Client(new GuzzClient(), new ResponseDataExtractor());
+if ($client->init()){
+    $client->write('db',['user' => 'password']);
+    $client->read('db');
+
+    $client->update('db',['user' => 'new_password']);
+    $client->read('db');
+
+    $client->delete('db');
+}
 
 

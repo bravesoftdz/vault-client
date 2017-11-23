@@ -125,7 +125,7 @@ class Client extends BaseClient
     }
 
     /**
-     * Read key from Vault
+     * Read key from the Vault
      *
      * @param string $key
      *
@@ -142,6 +142,8 @@ class Client extends BaseClient
     }
 
     /**
+     * Write key to Vault
+     *
      * @param $key
      * @param array $data
      * @return bool
@@ -154,5 +156,33 @@ class Client extends BaseClient
         return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
     }
 
+    /**
+     * Update key from the Vault
+     *
+     * @param $key
+     * @param array $data
+     * @return bool
+     */
+    public function update($key, array $data)
+    {
+        $options = array_merge(['json' => $data], $this->options);
+        $response = $this->send(new Request('PUT', $this->buildUri($key)), $options);
+
+        return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+    }
+
+
+
+    /**
+     * Delete key from the Vault
+     *
+     * @param $key
+     * @return bool
+     */
+    public function delete($key)
+    {
+        $response = $this->send(new Request('DELETE', $this->buildUri($key)), $this->options);
+        return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+    }
 
 }
