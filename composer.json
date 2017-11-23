@@ -23,9 +23,9 @@
         "eloquent/enumeration": "^5.1",
         "psr/http-message": "*",
         "guzzlehttp/guzzle": "^6.3",
-        "vlucas/phpdotenv": "^2.4"
     },
     "require-dev": {
+	"vlucas/phpdotenv": "^2.4"
         "phpunit/phpunit": "~6.0",
         "squizlabs/php_codesniffer": "3.*",
         "phpmetrics/phpmetrics": "*",

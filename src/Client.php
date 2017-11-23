@@ -15,12 +15,7 @@ use Psr\Http\Message\RequestInterface;
  * @package Dykyi
  */
 class Client extends BaseClient
-{
-    /**
-     * @var EnvEnumeration
-     */
-    private $env = null;
-
+{ 
     private $options = [];
 
     /**
@@ -33,9 +28,6 @@ class Client extends BaseClient
     public function __construct(ClientInterface $client, ResponseDataExtractor $extractor, $logger = null)
     {
         parent::__construct($client, $extractor, $logger);
-
-        // init env
-        $this->initEnv();
 
         // set default env
         $this->setEnvironment(EnvEnumeration::DEV());
@@ -170,8 +162,6 @@ class Client extends BaseClient
 
         return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
     }
-
-
 
     /**
      * Delete key from the Vault
