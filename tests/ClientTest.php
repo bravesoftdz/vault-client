@@ -9,21 +9,10 @@ use PHPUnit\Framework\TestCase;
  */
 class ClientTest extends TestCase
 {
-    /**
-     * Init env
-     */
-    private static function initEnv()
-    {
-        if (!file_exists(__DIR__ . '/../.env')) {
-            throw new \Exception(sprintf('File %s not found!', '.env'));
-        }
-        $dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
-        $dotenv->load();
-    }
 
     public static function setUpBeforeClass()
     {
-        self::initEnv();
+        //...
     }
 
     /**
