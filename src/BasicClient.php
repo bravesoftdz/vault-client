@@ -2,7 +2,9 @@
 
 namespace Dykyi;
 
+use Dykyi\Service\Cache\CacheInterface;
 use Dykyi\Exception\ClientException;
+use Dykyi\Service\Cache\NullCache;
 use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -12,12 +14,17 @@ use Psr\Log\NullLogger;
  * Class BaseClient
  * @package Dykyi
  */
-abstract class BaseClient implements LoggerAwareInterface
+abstract class BasicClient implements LoggerAwareInterface
 {
     /**
      * @var LoggerInterface
      */
     protected $logger;
+
+    /**
+     * @var CacheInterface
+     */
+    protected $cache;
 
     /**
      * @var ResponseDataExtractor
@@ -28,6 +35,8 @@ abstract class BaseClient implements LoggerAwareInterface
      * @var ClientInterface
      */
     protected $client = null;
+
+    abstract protected function setCache(CacheInterface $cacheDriver);
 
     /**
      * BaseClient constructor.
@@ -43,6 +52,7 @@ abstract class BaseClient implements LoggerAwareInterface
         $this->client = $client;
         $this->extractor = $extractor;
         $this->logger = $logger ?: new NullLogger();
+        $this->cache = new NullCache();
     }
 
     /**

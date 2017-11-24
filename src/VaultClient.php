@@ -2,6 +2,7 @@
 
 namespace Dykyi;
 
+use Dykyi\Service\Cache\CacheInterface;
 use Dykyi\Enumeration\EnvEnumeration;
 use Dykyi\Enumeration\VaultHttpStatusEnumeration;
 use Dykyi\Exception\ClientException;
@@ -14,12 +15,12 @@ use Psr\Http\Message\RequestInterface;
  * Class VaultClient
  * @package Dykyi
  */
-class VaultClient extends BaseClient
+class VaultClient extends BasicClient
 {
     /**
      * @var EnvEnumeration
      */
-    private $env = null;
+    private $env;
 
     private $options = [];
 
@@ -39,13 +40,24 @@ class VaultClient extends BaseClient
 
         // set default options
         $this->options = [
-            'base_uri' => getenv('VAULT_HOST'),
+            'base_uri'    => getenv('VAULT_HOST'),
             'http_errors' => false,
-            'headers' => [
+            'headers'     => [
                 'X-Vault-Token' => getenv('VAULT_ROOT_TOKEN_ID'),
-                'Content-Type' => 'application/json',
-            ]
+                'Content-Type'  => 'application/json',
+            ],
         ];
+    }
+
+    /**
+     * @param CacheInterface|null $cacheDriver
+     *
+     * @return bool
+     */
+    public function setCache(CacheInterface $cacheDriver = null)
+    {
+        $this->cache = $cacheDriver;
+        return true;
     }
 
     /**
@@ -54,7 +66,7 @@ class VaultClient extends BaseClient
      */
     private function buildUri($key = '')
     {
-        return  '/v1/secret/' . $this->getEnv() . $key;
+        return '/v1/secret/' . $this->getEnv() . $key;
     }
 
     /**
@@ -112,7 +124,8 @@ class VaultClient extends BaseClient
         }
 
         if (VaultHttpStatusEnumeration::INVALID_REQUEST()->id() <= $response->getStatusCode()) {
-            $message = sprintf('Something went wrong when calling vault (%s - %s).', $response->getStatusCode(), $response->getReasonPhrase());
+            $message = sprintf('Something went wrong when calling vault (%s - %s).', $response->getStatusCode(),
+                $response->getReasonPhrase());
             $this->logger->error($message);
 
             throw new ClientException($message, $response->getStatusCode(), $request);
@@ -132,8 +145,13 @@ class VaultClient extends BaseClient
      */
     public function read($key)
     {
+        $cacheData = $this->cache->read($key);
+        if ($cacheData !== null) {
+            return $cacheData;
+        }
+
         $response = $this->send(new Request('GET', $this->buildUri($key)), $this->options);
-        $extract = $this->extractor->extract($response);
+        $extract  = $this->extractor->extract($response);
 
         return $extract->data;
     }
@@ -145,10 +163,14 @@ class VaultClient extends BaseClient
      */
     public function write($key, array $data)
     {
-        $options = array_merge(['json' => $data], $this->options);
+        $options  = array_merge(['json' => $data], $this->options);
         $response = $this->send(new Request('POST', $this->buildUri($key)), $options);
+        $result   = $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
 
-        return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+        if ($result) {
+            $this->cache->write($key, $data);
+        }
+        return $result;
     }
 
     /**
@@ -160,10 +182,16 @@ class VaultClient extends BaseClient
      */
     public function update($key, array $data)
     {
-        $options = array_merge(['json' => $data], $this->options);
+        $options  = array_merge(['json' => $data], $this->options);
         $response = $this->send(new Request('PUT', $this->buildUri($key)), $options);
-        return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+        $result   = $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+
+        if ($result) {
+            $this->cache->update($key, $data);
+        }
+        return $result;
     }
+
     /**
      * Delete key from the Vault
      *
@@ -173,6 +201,11 @@ class VaultClient extends BaseClient
     public function delete($key)
     {
         $response = $this->send(new Request('DELETE', $this->buildUri($key)), $this->options);
-        return $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+        $result   = $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
+
+        if ($result) {
+            $this->cache->delete($key);
+        }
+        return $result;
     }
 }
