@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use Dykyi\VaultClient;
-use Dykyi\Enumeration\EnvEnumeration;
 
 /**
  * Class VaultClientTest
@@ -15,17 +14,10 @@ class VaultClientTest extends TestCase
     private $vaultMockClient;
 
     /**
-     * @covers ::setEnvironment
+     * @param $object
+     * @param $property
+     * @param $value
      */
-    public function testEnumeration()
-    {
-        $client = new VaultClient(new \GuzzleHttp\Client(), new \Dykyi\ResponseDataExtractor());
-        $this->assertEquals($client->getEnv(), EnvEnumeration::DEV()->type());
-
-        $client->setEnvironment(EnvEnumeration::TEST());
-        $this->assertEquals($client->getEnv(), EnvEnumeration::TEST()->type());
-    }
-
     public function setProtectedProperty($object, $property, $value)
     {
         $reflection = new ReflectionClass($object);
