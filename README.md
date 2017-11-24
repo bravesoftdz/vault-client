@@ -1,6 +1,6 @@
 # Vault Server
 
-How to run vault server on the Docker read [here](https://github.com/neb0t/docker_vault). Author: [neb0t](https://github.com/neb0t) 
+How to run vault server on the Docker read [here](https://github.com/neb0t/docker_vault). Author: [neb0t](https://www.linkedin.com/in/neb0t) 
 
 # Vault Client
 
