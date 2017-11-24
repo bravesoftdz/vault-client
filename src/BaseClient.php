@@ -43,19 +43,6 @@ abstract class BaseClient implements LoggerAwareInterface
         $this->client = $client;
         $this->extractor = $extractor;
         $this->logger = $logger ?: new NullLogger();
-
-
-    }
-    /**
-     * Init env
-     */
-    protected function initEnv()
-    {
-        if (!file_exists(__DIR__.'/../.env')) {
-            throw new ClientException(sprintf('File %s not found!', '.env'));
-        }
-        $dotenv = new \Dotenv\Dotenv(__DIR__.'/../');
-        $dotenv->load();
     }
 
     /**

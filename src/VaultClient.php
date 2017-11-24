@@ -11,10 +11,10 @@ use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * Class Client
+ * Class VaultClient
  * @package Dykyi
  */
-class Client extends BaseClient
+class VaultClient extends BaseClient
 {
     /**
      * @var EnvEnumeration
@@ -33,9 +33,6 @@ class Client extends BaseClient
     public function __construct(ClientInterface $client, ResponseDataExtractor $extractor, $logger = null)
     {
         parent::__construct($client, $extractor, $logger);
-
-        // init env
-        $this->initEnv();
 
         // set default env
         $this->setEnvironment(EnvEnumeration::DEV());
