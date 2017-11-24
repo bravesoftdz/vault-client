@@ -93,6 +93,8 @@ class VaultClientTest extends TestCase
             ->setMethods(['send'])
             ->getMock();
 
+        $this->setProtectedProperty($this->vaultMockClient, 'cache', new \Dykyi\Service\Cache\NullCache());
+
         $this->vaultMockClient->expects($this->any())
             ->method('send')
             ->willReturn($client->request('GET', '/'))
