@@ -32,11 +32,12 @@ to the require section of your ```composer.json```
 
 ## Usage
 
-Make sure to update your /.env file with your app ID & secret.
+1) Make sure to update your /.env file with your app ID & secret.
 ```
 VAULT_ROOT_TOKEN_ID=5HNcw7sdf1CcafOFflUes6VOdjPaIJJEDs
 VAULT_HOST=http://your-website.com/
 ```
+2) Or use function ``` setOptions() ```
 
 ## Example
 ```
