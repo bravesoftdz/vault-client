@@ -93,7 +93,7 @@ class VaultClientTest extends TestCase
             ->setMethods(['send'])
             ->getMock();
 
-        $this->setProtectedProperty($this->vaultMockClient, 'cache', new \Dykyi\Service\Cache\NullCache());
+        $this->setProtectedProperty($this->vaultMockClient, 'cache', new \Stash\Pool(new \Stash\Driver\Ephemeral()));
 
         $this->vaultMockClient->expects($this->any())
             ->method('send')

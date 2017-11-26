@@ -10,6 +10,8 @@ use Dykyi\Exception\TransferException;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
+use Stash\Interfaces\DriverInterface;
+use Stash\Interfaces\ItemInterface;
 
 /**
  * Class VaultClient
@@ -35,9 +37,15 @@ class VaultClient extends BasicClient
     {
         parent::__construct($client, $extractor, $logger);
 
-        // set default env
         $this->setEnvironment(EnvEnumeration::DEV());
+        $this->setDefaultOptions();
+    }
 
+    /**
+     * Default options take from .env file
+     */
+    private function setDefaultOptions()
+    {
         // set default options
         $this->options = [
             'base_uri'    => getenv('VAULT_HOST'),
@@ -50,14 +58,13 @@ class VaultClient extends BasicClient
     }
 
     /**
-     * @param CacheInterface|null $cacheDriver
-     *
-     * @return bool
+     * @param string $uri
+     * @param string $token
      */
-    public function setCache(CacheInterface $cacheDriver = null)
+    public function setOptions($uri, $token)
     {
-        $this->cache = $cacheDriver;
-        return true;
+        $this->options['base_uri'] = $uri;
+        $this->options['headers']['X-Vault-Token'] = $token;
     }
 
     /**
@@ -141,19 +148,20 @@ class VaultClient extends BasicClient
      *
      * @throws \RuntimeException
      *
-     * @return \stdClass|null
+     * @return ItemInterface
      */
     public function read($key)
     {
-        $cacheData = $this->cache->read($key);
-        if ($cacheData !== null) {
-            return $cacheData;
+        $cacheItem = $this->cache->getItem($this->buildUri($key));
+        if ($cacheItem->isMiss()) {
+            $response = $this->send(new Request('GET', $this->buildUri($key)), $this->options);
+            $extract = $this->extractor->extract($response);
+
+            $cacheItem->lock();
+            $this->cache->save($cacheItem->set($extract->data));
         }
 
-        $response = $this->send(new Request('GET', $this->buildUri($key)), $this->options);
-        $extract  = $this->extractor->extract($response);
-
-        return $extract->data;
+        return $cacheItem->get();
     }
 
     /**
@@ -168,7 +176,13 @@ class VaultClient extends BasicClient
         $result   = $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
 
         if ($result) {
-            $this->cache->write($key, $data);
+            $item = $this->cache->getItem($this->buildUri($key));
+            if($item->isMiss())
+            {
+                $item->lock();
+                $this->cache->save($item->set($data));
+            }
+
         }
         return $result;
     }
@@ -187,7 +201,10 @@ class VaultClient extends BasicClient
         $result   = $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
 
         if ($result) {
-            $this->cache->update($key, $data);
+            $this->cache->deleteItem($this->buildUri($key));
+            $item = $this->cache->getItem($this->buildUri($key));
+            $item->lock();
+            $this->cache->save($item->set($data));
         }
         return $result;
     }
@@ -204,7 +221,7 @@ class VaultClient extends BasicClient
         $result   = $response->getStatusCode() === VaultHttpStatusEnumeration::SUCCESS_NO_DATA()->id();
 
         if ($result) {
-            $this->cache->delete($key);
+            $this->cache->deleteItem($this->buildUri($key));
         }
         return $result;
     }

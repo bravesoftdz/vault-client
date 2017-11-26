@@ -9,6 +9,10 @@ use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Stash\Driver\Ephemeral;
+use Stash\Interfaces\DriverInterface;
+use Stash\Interfaces\PoolInterface;
+use Stash\Pool;
 
 /**
  * Class BaseClient
@@ -22,7 +26,7 @@ abstract class BasicClient implements LoggerAwareInterface
     protected $logger;
 
     /**
-     * @var CacheInterface
+     * @var PoolInterface
      */
     protected $cache;
 
@@ -35,8 +39,6 @@ abstract class BasicClient implements LoggerAwareInterface
      * @var ClientInterface
      */
     protected $client = null;
-
-    abstract protected function setCache(CacheInterface $cacheDriver);
 
     /**
      * BaseClient constructor.
@@ -52,8 +54,19 @@ abstract class BasicClient implements LoggerAwareInterface
         $this->client = $client;
         $this->extractor = $extractor;
         $this->logger = $logger ?: new NullLogger();
-        $this->cache = new NullCache();
+        $this->cache = new Pool(new Ephemeral());
     }
+
+    /**
+     * @param DriverInterface $driver
+     * @param array $options
+     */
+    public function setCache(DriverInterface $driver, $options)
+    {
+        $driver->setOptions($options);
+        $this->cache = new Pool($driver);
+    }
+
 
     /**
      * Sets a logger.

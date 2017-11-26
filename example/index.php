@@ -6,19 +6,21 @@ use Dykyi\VaultClient;
 use Dykyi\ResponseDataExtractor;
 use GuzzleHttp\Client;
 
-if (!file_exists(__DIR__ . '/.env')) {
-    throw new \Exception(sprintf('File %s not found!', '.env'));
-}
-$dotenv = new \Dotenv\Dotenv(__DIR__);
-$dotenv->load();
-
 $client = new VaultClient(new Client(), new ResponseDataExtractor());
+$client->setOptions('your_host','your_token');
+
 if ($client->init()) {
     $client->write('db', ['user' => 'password']);
-    $client->read('db');
 
+    echo 'Create key: ';
+    print_r($client->read('db'));
+    echo '<br>';
+
+    echo 'Update key: ';
     $client->update('db', ['user' => 'new_password']);
-    $client->read('db');
+    print_r($client->read('db'));
+    echo '<br>';
 
-    $client->delete('db');
+    echo 'Delete key: ';
+    echo (int)$client->delete('db');
 }
