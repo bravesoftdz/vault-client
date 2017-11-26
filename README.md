@@ -10,6 +10,9 @@ Vault is a tool for securely accessing secrets. A secret is anything that you wa
 
 All documentation is available on the [Vault website](https://www.vaultproject.io).
 
+## Cache system 
+[Stash](http://www.stashphp.com/index.html) - a package was used for cache data. Stash makes it easy to speed up your code by caching the results of expensive functions or code.
+
 ## Installation
 
 ### Composer
