@@ -22,13 +22,13 @@ The preferred way to install this extension is through [Composer](http://getcomp
 Either run
 
 ```
-composer require dykyi-roman/vault-client "dev-master"
+composer require dykyi-roman/vault-client
 ```
 
 or add
 
 ```
-"dykyi-roman/vault-client": "master"
+"dykyi-roman/vault-client": "^1.2"
 ```
 
 to the require section of your ```composer.json```
